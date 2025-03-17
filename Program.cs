@@ -1,6 +1,19 @@
 string baseDir = "..";
 HashSet<string> extensions = new HashSet<string>() { ".bmp", ".bsp", ".mdl", ".spr", ".tga", ".txt", ".wad", ".wav" };
 
+var lowerCaseToFileName = new Dictionary<string, string>();
+foreach (var extension in extensions) {
+    foreach (var fileName in Directory.GetFiles(baseDir, $"*{extension}", SearchOption.AllDirectories))
+    {
+        var mixedCaseFileName = Path.GetRelativePath(baseDir, Path.GetFullPath(fileName));
+        var lowerCaseFileName = mixedCaseFileName.ToLowerInvariant();
+        if (mixedCaseFileName == lowerCaseFileName)
+            continue;
+
+        lowerCaseToFileName.Add(lowerCaseFileName, mixedCaseFileName);
+    }
+}
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddResponseCompression();
@@ -16,8 +29,13 @@ app.MapGet("/{gameDirString}/{**fileName}", (string gameDirString, string fileNa
     var gameDirs = gameDirString.Split('+', StringSplitOptions.RemoveEmptyEntries);
     foreach (var gameDir in gameDirs)
     {
-        string fullPath = Path.GetFullPath(Path.Combine(baseDir, gameDir, fileName));
-        if(!File.Exists(fullPath))
+        var relativePath = Path.GetRelativePath(baseDir, Path.GetFullPath(Path.Combine(baseDir, gameDir, fileName)));
+        if (lowerCaseToFileName.TryGetValue(relativePath, out string? mixedCasePath))
+            relativePath = mixedCasePath;
+
+        var fullPath = Path.GetFullPath(Path.Combine(baseDir, relativePath));
+
+        if (!File.Exists(fullPath))
             continue;
 
         return Results.File(fullPath);
