@@ -3,7 +3,11 @@ HashSet<string> extensions = new HashSet<string>() { ".bmp", ".bsp", ".mdl", ".s
 
 var lowerCaseToFileName = new Dictionary<string, string>();
 foreach (var extension in extensions) {
-    foreach (var fileName in Directory.GetFiles(baseDir, $"*{extension}", SearchOption.AllDirectories))
+    foreach (var fileName in Directory.GetFiles(baseDir, $"*{extension}", new EnumerationOptions()
+    {
+        RecurseSubdirectories = true,
+        MatchCasing = MatchCasing.CaseInsensitive
+    }))
     {
         var mixedCaseFileName = Path.GetRelativePath(baseDir, Path.GetFullPath(fileName));
         var lowerCaseFileName = mixedCaseFileName.ToLowerInvariant();
