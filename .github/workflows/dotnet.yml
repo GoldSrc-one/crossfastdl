@@ -25,9 +25,9 @@ jobs:
     - name: Build
       run: |
         dotnet publish --configuration Release --os win -p:PublishSingleFile=true -p:PublishTrimmed=true
-        zip -r win64.zip bin/Release/net8.0/win-x64/publish
+        zip -rj win64.zip bin/Release/net8.0/win-x64/publish
         dotnet publish --configuration Release --os linux -p:PublishSingleFile=true -p:PublishTrimmed=true
-        tar -cf linux64.tar bin/Release/net8.0/linux-x64/publish
+        tar -cf linux64.tar -C bin/Release/net8.0/linux-x64/publish .
         
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
