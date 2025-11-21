@@ -43,13 +43,15 @@ app.MapGet("/{gameDirString}/{**fileName}", (string gameDirString, string fileNa
     if(gameDirString.Contains('.') || gameDirString.Contains('/') || gameDirString.Contains('\\') || fileName.Contains("..") || fileName.StartsWith(".") || fileName.Contains(":") || fileName.Contains('\\'))
         return Results.NotFound();
 
-    if (!paths.Any(p => p.IsMatch(fileName)))
+    var lowerCaseFileName = fileName.ToLowerInvariant();
+
+    if (!paths.Any(p => p.IsMatch(lowerCaseFileName)))
         return Results.NotFound();
 
     var gameDirs = gameDirString.Split('+', StringSplitOptions.RemoveEmptyEntries);
     foreach (var gameDir in gameDirs)
     {
-        var relativePath = Path.GetRelativePath(baseDir, Path.GetFullPath(Path.Combine(baseDir, gameDir, fileName))).Replace('\\', '/');
+        var relativePath = Path.GetRelativePath(baseDir, Path.GetFullPath(Path.Combine(baseDir, gameDir, lowerCaseFileName))).Replace('\\', '/');
         if (lowerCaseToFileName.TryGetValue(relativePath, out string? mixedCasePath))
             relativePath = mixedCasePath;
 
