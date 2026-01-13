@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 string baseDir = "..";
 
 Regex[] paths = [
+    new(@"events/.*(\.sc)$"),
     new(@"gfx/.*(\.bmp|\.tga)$"),
     new(@"maps/.*(\.bsp|\.txt)$"),
     new(@"models/.*(\.mdl)$"),
